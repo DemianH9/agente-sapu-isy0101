@@ -3,7 +3,7 @@
 **ISY0101 · Ingeniería de Soluciones con IA (Duoc UC) · Sección 009D**
 **Integrantes:** Cristian Valenzuela · Martín Chávez · Demian Hurtubia
 
-Instrumenta el agente de la EP2 (LangChain, 4 herramientas, Mistral) para medir **precisión, consistencia, errores, latencia, recursos y costo** en 20 casos con respuesta esperada y 9 escenarios de variabilidad. Compara el agente **v1** (EP2 sin cambios) con el **v2** (correcciones R1–R3) y muestra los resultados en un **dashboard Streamlit**.
+Instrumenta el agente de la EP2 (LangChain, 4 herramientas) para medir **precisión, consistencia, errores, latencia, recursos y costo** en 20 casos con respuesta esperada y 9 escenarios de variabilidad. Compara el agente **v1** (EP2 sin cambios) con el **v2** (correcciones R1–R3) y muestra los resultados en un **dashboard Streamlit**.
 
 ## Estructura
 
@@ -28,13 +28,13 @@ Instrumenta el agente de la EP2 (LangChain, 4 herramientas, Mistral) para medir 
 | Consistencia | % de casos con igual veredicto y herramientas en las 3 repeticiones | ≥ 95 % |
 | Frecuencia de errores | % con excepción, *rate limit*, *timeout* o tope de iteraciones | ≤ 2 % |
 | Latencia | p50, p95 y % sobre el SLO de 8 s; desglose LLM / herramientas | p95 ≤ 8 s |
-| Recursos y costo | Llamadas al LLM, tokens, CPU, RAM y US$ por consulta (Mistral Small: US$ 0,15 / 0,60 por millón de tokens) | Línea base v1 |
+| Recursos y costo | Llamadas al LLM, tokens, CPU, RAM y US$ por consulta (precio de lista del modelo usado, aunque se corra en plan gratuito) | Línea base v1 |
 
 ## Cómo ejecutar
 
 ### 1. Notebook (Google Colab, recomendado)
 1. Abre `agente_sapu_EP3_observabilidad.ipynb` con el botón **Open in Colab**.
-2. En 🔑 **Secrets** crea `LLM_API_KEY` (clave de Mistral) y habilita el acceso del notebook.
+2. En la sección 2 elige `PROVEEDOR` (`"mistral"`, `"gemini"` o `"groq"`) y crea en 🔑 **Secrets** la clave que indica la tabla (`LLM_API_KEY`, `GEMINI_API_KEY` o `GROQ_API_KEY`), con acceso habilitado para el notebook. Groq tiene plan gratuito sin tarjeta; con él, los embeddings se calculan localmente.
 3. **Entorno de ejecución → Ejecutar todas**. Tarda entre 20 y 30 minutos (180 ejecuciones con pausas de 1 s por el límite del plan gratuito). Si Colab se desconecta, vuelve a ejecutar: las ejecuciones ya registradas no se repiten.
 4. La sección 12 copia `ep3_resultados.zip` (logs, resultados y figuras) a `Mi unidad/EP3_SAPU/`.
 

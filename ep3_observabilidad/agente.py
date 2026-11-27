@@ -205,20 +205,45 @@ SYSTEM_V2 = SYSTEM_V1 + (
 SYSTEMS = {"v1": SYSTEM_V1, "v2": SYSTEM_V2}
 
 
+# Proveedores compatibles con la API de OpenAI. Precios en US$ por millón de tokens (entrada, salida),
+# usados para estimar el costo equivalente aunque se use un plan gratuito.
+PROVEEDORES = {
+    "mistral": {"base_url": "https://api.mistral.ai/v1", "modelo": "mistral-small-latest",
+                "embeddings": "mistral-embed", "precio": (0.15, 0.60), "secret": "LLM_API_KEY"},
+    "gemini": {"base_url": "https://generativelanguage.googleapis.com/v1beta/openai/", "modelo": "gemini-2.5-flash-lite",
+               "embeddings": "gemini-embedding-001", "precio": (0.10, 0.40), "secret": "GEMINI_API_KEY"},
+    "groq": {"base_url": "https://api.groq.com/openai/v1", "modelo": "llama-3.1-8b-instant",
+             "embeddings": None, "precio": (0.05, 0.08), "secret": "GROQ_API_KEY"},
+}
+EMBEDDINGS_LOCALES = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
+
+def proveedor_actual() -> dict:
+    import os
+    p = dict(PROVEEDORES[os.getenv("LLM_PROVEEDOR", "mistral")])
+    p["nombre"] = os.getenv("LLM_PROVEEDOR", "mistral")
+    p["base_url"] = os.getenv("LLM_BASE_URL") or p["base_url"]
+    p["modelo"] = os.getenv("LLM_MODEL") or p["modelo"]
+    return p
+
+
 def crear_llm(temperatura: float = 0.0):
     import os
     from langchain_openai import ChatOpenAI
-    return ChatOpenAI(base_url=os.getenv("LLM_BASE_URL", "https://api.mistral.ai/v1"),
-                      api_key=os.getenv("LLM_API_KEY"),
-                      model=os.getenv("LLM_MODEL", "mistral-small-latest"),
+    p = proveedor_actual()
+    return ChatOpenAI(base_url=p["base_url"], api_key=os.getenv("LLM_API_KEY"), model=p["modelo"],
                       temperature=temperatura, timeout=30, max_retries=0)
 
 
 def crear_embeddings():
+    """Embeddings del proveedor; si no ofrece (Groq), modelo local multilingüe de Hugging Face."""
     import os
+    p = proveedor_actual()
+    if p["embeddings"] is None:
+        from langchain_huggingface import HuggingFaceEmbeddings
+        return HuggingFaceEmbeddings(model_name=EMBEDDINGS_LOCALES)
     from langchain_openai import OpenAIEmbeddings
-    return OpenAIEmbeddings(base_url=os.getenv("LLM_BASE_URL", "https://api.mistral.ai/v1"),
-                            api_key=os.getenv("LLM_API_KEY"), model="mistral-embed",
+    return OpenAIEmbeddings(base_url=p["base_url"], api_key=os.getenv("LLM_API_KEY"), model=p["embeddings"],
                             check_embedding_ctx_length=False)
 
 

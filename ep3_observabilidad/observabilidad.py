@@ -20,9 +20,14 @@ from langchain_core.callbacks import BaseCallbackHandler
 
 from agente import contiene_pii_v2, enmascarar
 
-# Precios Mistral Small (US$ por token). Fuente: https://docs.mistral.ai/models/pricing (nov. 2026)
-PRECIO_ENTRADA = 0.15 / 1_000_000
-PRECIO_SALIDA = 0.60 / 1_000_000
+from agente import proveedor_actual
+
+
+def precios() -> tuple[float, float]:
+    """US$ por token (entrada, salida) del proveedor configurado (costo equivalente de lista)."""
+    ent, sal = proveedor_actual()["precio"]
+    return ent / 1_000_000, sal / 1_000_000
+
 SLO_LATENCIA_S = 8.0
 
 LOG_DIR = pathlib.Path(os.getenv("EP3_LOG_DIR", "logs"))
@@ -120,13 +125,22 @@ def _es_rate_limit(e: Exception) -> bool:
     return type(e).__name__ == "RateLimitError" or "429" in str(e) or "rate limit" in str(e).lower()
 
 
+def _espera_rate_limit(e: Exception, intento: int) -> float:
+    """Usa el tiempo que sugiere el proveedor ('try again in 12.3s'); si no, backoff exponencial."""
+    import re
+    m = re.search(r"try again in (?:(\d+)m)?([\d.]+)s", str(e))
+    if m:
+        return min(90.0, 60 * int(m.group(1) or 0) + float(m.group(2)) + 1)
+    return min(60.0, 2 ** (intento + 2))
+
+
 def _es_timeout(e: Exception) -> bool:
     return "Timeout" in type(e).__name__ or "timed out" in str(e).lower()
 
 
 def ejecutar_observado(executor, consulta: str, *, version: str, guardrail, meta: dict | None = None,
                        logger: logging.Logger | None = None, evaluar=None,
-                       ruta_jsonl: pathlib.Path | None = None, max_reintentos: int = 3) -> dict:
+                       ruta_jsonl: pathlib.Path | None = None, max_reintentos: int = 6) -> dict:
     """Ejecuta una consulta con trazabilidad completa y devuelve el registro (ya enmascarado).
 
     evaluar(registro_sin_enmascarar) -> dict de chequeos (opcional); se agrega como 'checks'.
@@ -139,7 +153,7 @@ def ejecutar_observado(executor, consulta: str, *, version: str, guardrail, meta
     trace_id = uuid.uuid4().hex[:12]
     proc = psutil.Process()
     reg = {"trace_id": trace_id, "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-           "version": version, **meta, "consulta": consulta, "respuesta": None, "bloqueado": False,
+           "version": version, "modelo": f"{proveedor_actual()['nombre']}/{proveedor_actual()['modelo']}", **meta, "consulta": consulta, "respuesta": None, "bloqueado": False,
            "pii_enviada_al_llm": False, "herramientas": [], "spans": [], "latencia_s": 0.0,
            "t_llm_s": 0.0, "t_tools_s": 0.0, "llamadas_llm": 0, "tokens_entrada": 0, "tokens_salida": 0,
            "costo_usd": 0.0, "cpu_s": 0.0, "ram_mb": 0.0, "error": None, "reintentos": 0, "rate_limits": 0}
@@ -171,7 +185,7 @@ def ejecutar_observado(executor, consulta: str, *, version: str, guardrail, meta
                 if _es_rate_limit(e) and intento < max_reintentos:
                     reg["rate_limits"] += 1
                     reg["reintentos"] += 1
-                    espera = 2 ** (intento + 1)
+                    espera = _espera_rate_limit(e, intento)
                     logger.warning(f"{etiqueta} rate_limit intento={intento + 1} espera={espera}s")
                     time.sleep(espera)
                     continue
@@ -192,7 +206,8 @@ def ejecutar_observado(executor, consulta: str, *, version: str, guardrail, meta
                 cpu_s=round(sum(proc.cpu_times()[:2]) - cpu0, 3),
                 ram_mb=round(proc.memory_info().rss / 2**20, 1),
             )
-            reg["costo_usd"] = round(reg["tokens_entrada"] * PRECIO_ENTRADA + reg["tokens_salida"] * PRECIO_SALIDA, 8)
+            p_in, p_out = precios()
+            reg["costo_usd"] = round(reg["tokens_entrada"] * p_in + reg["tokens_salida"] * p_out, 8)
             break
 
         # 3) Eventos de log
