@@ -91,7 +91,8 @@ def metricas(df: pd.DataFrame) -> dict:
     """Métricas de una configuración (versión + temperatura)."""
     al_llm = df[~df["bloqueado"]]
     pii = df[df["pii_caso"]]
-    cons = df.groupby("caso_id").agg(v=("correcto", "nunique"), h=("herr_firma", "nunique"))
+    # Consistencia por configuración (versión + temperatura) y caso: con varias configuraciones se promedian
+    cons = df.groupby(["config", "caso_id"]).agg(v=("correcto", "nunique"), h=("herr_firma", "nunique"))
     lat = al_llm["latencia_s"]
     return {
         "ejecuciones": len(df),

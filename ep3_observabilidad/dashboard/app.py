@@ -66,7 +66,7 @@ kpis = [
     ("Tiempo en el LLM", fmt(m["llm_pct_tiempo"], 1, " %"), "del total"),
     ("Llamadas LLM / consulta", fmt(m["llamadas_llm"], 2), "promedio"),
     ("Tokens / consulta", fmt(m["tokens_consulta"], 0), "entrada + salida"),
-    ("US$ / 1.000 consultas", fmt(m["usd_1000"], 3), "Mistral Small"),
+    ("US$ / 1.000 consultas", fmt(m["usd_1000"], 3), ", ".join(sorted(df["modelo"].dropna().unique())) if "modelo" in df else "precio de lista"),
     ("RAM máx.", fmt(m["ram_mb"], 0, " MB"), f"CPU {fmt(m['cpu_s'], 2, ' s')}/consulta"),
 ]
 for fila in (kpis[:6], kpis[6:]):
