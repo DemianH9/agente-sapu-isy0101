@@ -138,9 +138,10 @@ def _espera_rate_limit(e: Exception, intento: int) -> float:
     """Usa el tiempo que sugiere el proveedor ('try again in 12.3s'); si no, backoff exponencial."""
     import re
     m = re.search(r"try again in (?:(\d+)m)?([\d.]+)s", str(e))
+    base = min(90.0, 2 ** (intento + 1))          # 2, 4, 8, 16, 32, 64, 90 s
     if m:
-        return min(90.0, 60 * int(m.group(1) or 0) + float(m.group(2)) + 1)
-    return min(60.0, 2 ** (intento + 2))
+        return max(base, min(90.0, 60 * int(m.group(1) or 0) + float(m.group(2)) + 1))
+    return base
 
 
 def _es_timeout(e: Exception) -> bool:
@@ -149,7 +150,7 @@ def _es_timeout(e: Exception) -> bool:
 
 def ejecutar_observado(executor, consulta: str, *, version: str, guardrail, meta: dict | None = None,
                        logger: logging.Logger | None = None, evaluar=None,
-                       ruta_jsonl: pathlib.Path | None = None, max_reintentos: int = 6) -> dict:
+                       ruta_jsonl: pathlib.Path | None = None, max_reintentos: int = 8) -> dict:
     """Ejecuta una consulta con trazabilidad completa y devuelve el registro (ya enmascarado).
 
     evaluar(registro_sin_enmascarar) -> dict de chequeos (opcional); se agrega como 'checks'.

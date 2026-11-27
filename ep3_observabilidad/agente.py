@@ -214,7 +214,7 @@ PROVEEDORES = {
                "embeddings": "gemini-embedding-001", "precio": (0.10, 0.40), "secret": "GEMINI_API_KEY"},
     "groq": {"base_url": "https://api.groq.com/openai/v1", "modelo": "openai/gpt-oss-20b",
              "embeddings": None, "precio": (0.075, 0.30), "secret": "GROQ_API_KEY",
-             "extra": {"reasoning_effort": "low"}},
+             "extra": {"reasoning_effort": "low"}, "tpm": 8000},
 }
 EMBEDDINGS_LOCALES = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 

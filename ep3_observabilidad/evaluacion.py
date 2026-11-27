@@ -8,6 +8,7 @@ import time
 
 import pandas as pd
 
+from agente import proveedor_actual
 from observabilidad import SLO_LATENCIA_S, LimiteDiarioAlcanzado, ejecutar_observado
 
 CITA = re.compile(r"\bp\.?\s?\d+|p[áa]g(?:ina|\.)?\s*\d+", re.IGNORECASE)
@@ -70,7 +71,10 @@ def correr(executor, casos, *, version, temperatura, repeticiones, guardrail, lo
                       f"{'OK ' if r['correcto'] else 'FALLA'} {r['latencia_s']:5.2f}s "
                       f"tools={','.join(r['herramientas']) or '-'}{' ERR=' + r['error'] if r['error'] else ''}")
             if not r["bloqueado"]:
-                time.sleep(pausa_s)  # respeta el límite de 1 req/s del plan gratuito de Mistral
+                # Ritmo según el límite de tokens por minuto del plan gratuito (75 % del tope, para dejar margen)
+                tpm = proveedor_actual().get("tpm")
+                tokens = r["tokens_entrada"] + r["tokens_salida"]
+                time.sleep(max(pausa_s, 60 * tokens / (0.75 * tpm)) if tpm else pausa_s)
     return regs
 
 
