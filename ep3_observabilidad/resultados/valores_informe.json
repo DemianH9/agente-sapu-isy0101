@@ -1,0 +1,178 @@
+{
+ "comparacion": {
+  "v1_0": {
+   "prec_guard": "71,7 % / 60,0 %",
+   "consistencia": "95,0 %",
+   "error": "0,0 %",
+   "latencia": "0,79 / 1,16",
+   "llm": "95,1 %",
+   "tokens_costo": "1468 / 0,140"
+  },
+  "v1_7": {
+   "prec_guard": "63,3 % / 60,0 %",
+   "consistencia": "65,0 %",
+   "error": "0,0 %",
+   "latencia": "0,77 / 1,14",
+   "llm": "94,8 %",
+   "tokens_costo": "1434 / 0,134"
+  },
+  "v2_0": {
+   "prec_guard": "85,0 % / 100,0 %",
+   "consistencia": "80,0 %",
+   "error": "0,0 %",
+   "latencia": "0,77 / 1,13",
+   "llm": "95,4 %",
+   "tokens_costo": "1393 / 0,129"
+  }
+ },
+ "hallazgos": {
+  "H2": [
+   6,
+   6
+  ],
+  "H3_evidencia": [
+   "95,1",
+   "2,6"
+  ],
+  "H3_impacto": [
+   "1,12"
+  ],
+  "H4": [
+   5,
+   6
+  ],
+  "H5": [
+   "95,0",
+   "65,0",
+   0,
+   0
+  ]
+ },
+ "recomendaciones": {
+  "R1": [
+   "60",
+   "100"
+  ],
+  "R2": [
+   "0",
+   "67"
+  ],
+  "R3": [
+   "0",
+   "100"
+  ]
+ },
+ "costo": [
+  "0,129",
+  50,
+  "0,58"
+ ],
+ "precision_por_escenario": {
+  "v1 · T=0.0": {
+   "base": 100,
+   "dato_faltante": 0,
+   "farmaco_ausente": 100,
+   "limite": 100,
+   "nombre_sin_rut": 0,
+   "parafraseo": 66.7,
+   "prompt_injection": 100,
+   "ruido": 0,
+   "rut_formatos": 75
+  },
+  "v1 · T=0.7": {
+   "base": 66.7,
+   "dato_faltante": 33.3,
+   "farmaco_ausente": 83.3,
+   "limite": 83.3,
+   "nombre_sin_rut": 0,
+   "parafraseo": 66.7,
+   "prompt_injection": 100,
+   "ruido": 0,
+   "rut_formatos": 75
+  },
+  "v2 · T=0.0": {
+   "base": 66.7,
+   "dato_faltante": 100,
+   "farmaco_ausente": 100,
+   "limite": 100,
+   "nombre_sin_rut": 100,
+   "parafraseo": 50,
+   "prompt_injection": 100,
+   "ruido": 66.7,
+   "rut_formatos": 100
+  }
+ },
+ "metricas": {
+  "v1_0": {
+   "ejecuciones": 60,
+   "precision_pct": 71.667,
+   "guardrail_pct": 60.0,
+   "consistencia_pct": 95.0,
+   "error_pct": 0.0,
+   "rate_limits": 0,
+   "max_iteraciones": 0,
+   "p50_s": 0.792,
+   "p95_s": 1.16,
+   "sobre_slo_pct": 0.0,
+   "llm_pct_tiempo": 95.059,
+   "tools_pct_tiempo": 3.572,
+   "llamadas_llm": 2.353,
+   "tokens_consulta": 1467.65,
+   "usd_1000": 0.14,
+   "cpu_s": 0.102,
+   "ram_mb": 1203.1
+  },
+  "v1_7": {
+   "ejecuciones": 60,
+   "precision_pct": 63.333,
+   "guardrail_pct": 60.0,
+   "consistencia_pct": 65.0,
+   "error_pct": 0.0,
+   "rate_limits": 0,
+   "max_iteraciones": 0,
+   "p50_s": 0.771,
+   "p95_s": 1.139,
+   "sobre_slo_pct": 0.0,
+   "llm_pct_tiempo": 94.78,
+   "tools_pct_tiempo": 3.819,
+   "llamadas_llm": 2.314,
+   "tokens_consulta": 1434.2,
+   "usd_1000": 0.134,
+   "cpu_s": 0.099,
+   "ram_mb": 1203.8
+  },
+  "v2_0": {
+   "ejecuciones": 60,
+   "precision_pct": 85.0,
+   "guardrail_pct": 100.0,
+   "consistencia_pct": 80.0,
+   "error_pct": 0.0,
+   "rate_limits": 0,
+   "max_iteraciones": 0,
+   "p50_s": 0.77,
+   "p95_s": 1.128,
+   "sobre_slo_pct": 0.0,
+   "llm_pct_tiempo": 95.373,
+   "tools_pct_tiempo": 3.314,
+   "llamadas_llm": 2.133,
+   "tokens_consulta": 1392.617,
+   "usd_1000": 0.129,
+   "cpu_s": 0.095,
+   "ram_mb": 1206.2
+  }
+ },
+ "traza_mas_lenta": {
+  "trace_id": "53a9b70b8f76",
+  "config": "v1 · T=0.7",
+  "caso": "C04",
+  "latencia_s": 1.88,
+  "spans": 5
+ },
+ "corrida": {
+  "fecha": "2026-11-27",
+  "proveedor": "groq",
+  "modelo": "openai/gpt-oss-20b",
+  "embeddings": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "ejecuciones": 180
+ }
+}

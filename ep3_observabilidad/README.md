@@ -16,8 +16,9 @@ Instrumenta el agente de la EP2 (LangChain, 4 herramientas) para medir **precisi
 | `casos_prueba.json` | IE1 | 20 casos en 9 escenarios: base, parafraseo, ruido (tipeo), límite, dato faltante, fármaco ausente, formatos de RUT, nombre sin RUT y *prompt injection* |
 | `tests/test_deterministas.py` | IE3 | 25 pruebas sin LLM: confirman H1 y H2 y validan la instrumentación |
 | `dashboard/app.py` | IE4 | Dashboard: 12 KPI, filtros y pestañas de precisión, latencia, errores, explorador de trazas (*waterfall*) y comparación v1/v2 |
-| `resultados/` | IE5 | `comparacion.csv`, `metricas.csv`, `hallazgos.json`, `precision_por_escenario.csv` y export enmascarado de las ejecuciones |
-| `figuras/` · `evidencia/` | IE5 | Figuras del notebook y capturas del dashboard usadas en el informe |
+| `resultados/` | IE5 | `valores_informe.json`: métricas por configuración, hallazgos y valores citados en el informe (corrida del 27-11-2026) |
+| `figuras/` · `evidencia/` | IE5 | Figuras del informe y capturas del dashboard con los datos reales (KPI, precisión, errores, trazas, comparación) |
+| `valores_informe.py` | IE5 | Calcula desde `logs/ejecuciones.jsonl` los valores que cita el informe |
 
 ## Métricas
 
@@ -54,12 +55,25 @@ jupyter notebook agente_sapu_EP3_observabilidad.ipynb
 cd ep3_observabilidad
 streamlit run dashboard/app.py
 ```
-Lee `logs/ejecuciones.jsonl` si existe (corrida propia). Si no existe, usa `resultados/ejecuciones_enmascaradas.jsonl`, el export de la corrida del informe, así que el dashboard se puede revisar sin ejecutar el notebook.
+Lee `logs/ejecuciones.jsonl`, que genera el notebook (o la ruta de la variable `EP3_EJECUCIONES`). En Colab se puede abrir con `serve_kernel_port_as_window(8501)` agregando `--server.enableCORS false --server.enableXsrfProtection false`. Las capturas de la corrida del informe están en `evidencia/`.
+
+## Resultados de la corrida (27-11-2026, Groq `openai/gpt-oss-20b`, 180 ejecuciones)
+
+| Indicador | v1 · T = 0,0 | v1 · T = 0,7 | v2 · T = 0,0 |
+|---|---|---|---|
+| Precisión / guardrail | 71,7 % / 60 % | 63,3 % / 60 % | 85,0 % / 100 % |
+| Consistencia | 95 % | 65 % | 80 % |
+| Tasa de error | 0 % | 0 % | 0 % |
+| Latencia p50 / p95 | 0,79 / 1,16 s | 0,77 / 1,14 s | 0,77 / 1,13 s |
+| Tiempo en el LLM | 95,1 % | 94,8 % | 95,4 % |
+| Tokens / US$ por 1.000 consultas | 1468 / 0,140 | 1434 / 0,134 | 1393 / 0,129 |
+
+![Dashboard](evidencia/dashboard_kpi.png)
 
 ## Privacidad
 - El guardrail se aplica **antes** del LLM; v2 detecta RUT en cualquier formato, correo, teléfono y nombres.
 - `enmascarar()` reemplaza los datos personales por `[RUT]`, `[NOMBRE]`, etc. **antes** de escribir cualquier log.
-- `logs/` está en `.gitignore`. El export de `resultados/` solo contiene casos de prueba ficticios ya enmascarados.
+- `logs/` está en `.gitignore`: los registros crudos no se versionan; `resultados/` solo guarda métricas agregadas.
 - Todos los RUT y nombres de `casos_prueba.json` son ficticios.
 
 ## Uso de IA
