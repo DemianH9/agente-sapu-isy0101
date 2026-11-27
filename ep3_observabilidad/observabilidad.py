@@ -121,6 +121,15 @@ class TrazaHandler(BaseCallbackHandler):
         self._cerrar(run_id, "error", error=type(error).__name__)
 
 
+class LimiteDiarioAlcanzado(RuntimeError):
+    """Cuota diaria del proveedor agotada: se detiene la corrida para reanudarla después (no es un error del agente)."""
+
+
+def _es_limite_diario(e: Exception) -> bool:
+    t = str(e).lower()
+    return "per day" in t or "(tpd)" in t or "(rpd)" in t
+
+
 def _es_rate_limit(e: Exception) -> bool:
     return type(e).__name__ == "RateLimitError" or "429" in str(e) or "rate limit" in str(e).lower()
 
@@ -182,6 +191,9 @@ def ejecutar_observado(executor, consulta: str, *, version: str, guardrail, meta
                 if "stopped due to" in reg["respuesta"].lower():
                     reg["error"] = "max_iteraciones"
             except Exception as e:  # noqa: BLE001
+                if _es_rate_limit(e) and _es_limite_diario(e):
+                    logger.warning(f"{etiqueta} limite_diario_proveedor detalle='{str(e)[:160]}'")
+                    raise LimiteDiarioAlcanzado(str(e)[:300]) from e
                 if _es_rate_limit(e) and intento < max_reintentos:
                     reg["rate_limits"] += 1
                     reg["reintentos"] += 1

@@ -8,7 +8,7 @@ import time
 
 import pandas as pd
 
-from observabilidad import SLO_LATENCIA_S, ejecutar_observado
+from observabilidad import SLO_LATENCIA_S, LimiteDiarioAlcanzado, ejecutar_observado
 
 CITA = re.compile(r"\bp\.?\s?\d+|p[áa]g(?:ina|\.)?\s*\d+", re.IGNORECASE)
 
@@ -57,9 +57,13 @@ def correr(executor, casos, *, version, temperatura, repeticiones, guardrail, lo
                 continue
             meta = {"temperatura": temperatura, "repeticion": rep, "caso_id": caso["id"],
                     "escenario": caso["escenario"], "categoria": caso["categoria"]}
-            r = ejecutar_observado(executor, caso["consulta"], version=version, guardrail=guardrail, meta=meta,
-                                   logger=logger, evaluar=lambda reg, c=caso: evaluar(c, reg),
-                                   ruta_jsonl=ruta_jsonl)
+            try:
+                r = ejecutar_observado(executor, caso["consulta"], version=version, guardrail=guardrail, meta=meta,
+                                       logger=logger, evaluar=lambda reg, c=caso: evaluar(c, reg),
+                                       ruta_jsonl=ruta_jsonl)
+            except LimiteDiarioAlcanzado as e:
+                print(f"⏸️ Cuota diaria del proveedor agotada ({e}). Vuelve a ejecutar más tarde: se reanuda donde quedó.")
+                raise
             regs.append(r)
             if verbose:
                 print(f"[{len(regs):>3}/{n}] {version} T={temperatura} rep{rep} {caso['id']:<4} "

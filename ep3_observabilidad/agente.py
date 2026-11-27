@@ -212,8 +212,9 @@ PROVEEDORES = {
                 "embeddings": "mistral-embed", "precio": (0.15, 0.60), "secret": "LLM_API_KEY"},
     "gemini": {"base_url": "https://generativelanguage.googleapis.com/v1beta/openai/", "modelo": "gemini-2.5-flash-lite",
                "embeddings": "gemini-embedding-001", "precio": (0.10, 0.40), "secret": "GEMINI_API_KEY"},
-    "groq": {"base_url": "https://api.groq.com/openai/v1", "modelo": "llama-3.1-8b-instant",
-             "embeddings": None, "precio": (0.05, 0.08), "secret": "GROQ_API_KEY"},
+    "groq": {"base_url": "https://api.groq.com/openai/v1", "modelo": "openai/gpt-oss-20b",
+             "embeddings": None, "precio": (0.075, 0.30), "secret": "GROQ_API_KEY",
+             "extra": {"reasoning_effort": "low"}},
 }
 EMBEDDINGS_LOCALES = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
@@ -232,7 +233,7 @@ def crear_llm(temperatura: float = 0.0):
     from langchain_openai import ChatOpenAI
     p = proveedor_actual()
     return ChatOpenAI(base_url=p["base_url"], api_key=os.getenv("LLM_API_KEY"), model=p["modelo"],
-                      temperature=temperatura, timeout=30, max_retries=0)
+                      temperature=temperatura, timeout=30, max_retries=0, **p.get("extra", {}))
 
 
 def crear_embeddings():

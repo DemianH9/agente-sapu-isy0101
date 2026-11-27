@@ -35,7 +35,7 @@ Instrumenta el agente de la EP2 (LangChain, 4 herramientas) para medir **precisi
 ### 1. Notebook (Google Colab, recomendado)
 1. Abre `agente_sapu_EP3_observabilidad.ipynb` con el botón **Open in Colab**.
 2. En la sección 2 elige `PROVEEDOR` (`"mistral"`, `"gemini"` o `"groq"`) y crea en 🔑 **Secrets** la clave que indica la tabla (`LLM_API_KEY`, `GEMINI_API_KEY` o `GROQ_API_KEY`), con acceso habilitado para el notebook. Groq tiene plan gratuito sin tarjeta; con él, los embeddings se calculan localmente.
-3. **Entorno de ejecución → Ejecutar todas**. Tarda entre 20 y 30 minutos (180 ejecuciones con pausas de 1 s por el límite del plan gratuito). Si Colab se desconecta, vuelve a ejecutar: las ejecuciones ya registradas no se repiten.
+3. **Entorno de ejecución → Ejecutar todas**. Tarda entre 40 y 60 minutos en el plan gratuito de Groq (180 ejecuciones; los reintentos respetan el límite por minuto y, si se agota la cuota diaria, la corrida se pausa). Si Colab se desconecta, vuelve a ejecutar: las ejecuciones ya registradas no se repiten.
 4. La sección 12 copia `ep3_resultados.zip` (logs, resultados y figuras) a `Mi unidad/EP3_SAPU/`.
 
 ### 2. Local
