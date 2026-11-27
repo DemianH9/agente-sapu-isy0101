@@ -1,0 +1,6 @@
+# Los logs crudos quedan fuera del repositorio (minimización de datos, Ley 21.719)
+logs/
+derivaciones/
+ep3_resultados.zip
+__pycache__/
+.pytest_cache/

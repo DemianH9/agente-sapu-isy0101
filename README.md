@@ -1,4 +1,6 @@
-# Agente Clínico de Apoyo para SAPU — EP2 ISY0101
+# Agente Clínico de Apoyo para SAPU — ISY0101 (EP1, EP2 y EP3)
+
+> **EP3 — Observabilidad:** ver [`ep3_observabilidad/`](ep3_observabilidad/) (métricas, trazas, logs, casos de prueba, dashboard Streamlit y comparación v1/v2).
 
 **Asignatura:** ISY0101 Ingeniería de Soluciones con Inteligencia Artificial (Duoc UC)
 **Integrantes:** Cristian Valenzuela · Martin Chavez · Demian Hurtubia
@@ -49,6 +51,7 @@ Versión en texto, con el flujo de planificación y re-planificación (Plan-and-
 | `notebooks/agente_sapu_IL2_1.ipynb` | IL2.1 (IE1, IE2) | Agente LangChain con 4 herramientas: 2 de consulta, 1 de razonamiento, 1 de escritura |
 | `notebooks/agente_sapu_IL2_2.ipynb` | IL2.2 (IE3, IE4) | Memoria de corto plazo, bitácora persistente y recuperación semántica de casos previos |
 | `notebooks/agente_sapu_IL2_3.ipynb` | IL2.3 (IE5) | Planificación (plan → validación → prioridad → ejecución) y re-planificación adaptativa |
+| `ep3_observabilidad/` | EP3 (IE1–IE5) | Observabilidad: trazas, métricas, 20 casos de variabilidad, dashboard y agente v2 |
 | `evidencia/` | — | Capturas de las pruebas ejecutadas |
 | `docs/orquestacion.png` | — | Diagrama de orquestación de componentes |
 | `requirements.txt` · `.env.example` | — | Dependencias y variables de entorno |
